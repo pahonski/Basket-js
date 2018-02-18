@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Корзина</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="basket-wrapper">
+
+</div>
+<hr>
+<div class="goods">
+
+</div>
+</body>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="js/Container.js"></script>
+<script src="js/Basket.js"></script>
+<script src="js/Good.js"></script>
+<script>
+  $(document).ready(function () {
+      var good1 = new Good('Клавиатура', 1500, 2234, './img/keybord.png');
+      good1.render();
+
+      var good2 = new Good('Мышь', 880, 2734, './img/mouse.png');
+      good2.render();
+
+      var good3 = new Good('Монитор', 2800, 165, './img/monitor.png');
+      good3.render();
+
+      var basket = new Basket('basket');
+      basket.render();
+
+
+      $('.buy-button').on('click', function () {
+          var price = parseInt($(this).parent().find('.price').text());
+          var id = parseInt($(this).attr('data-id'));
+          basket.add(id, price);
+      });
+
+  });
+</script>
+</html>
