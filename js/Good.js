@@ -37,5 +37,21 @@ Good.prototype.render = function () {
     $goodPrice.appendTo($goodContainer);
     $buyButton.appendTo($goodContainer);
     $('.goods').append($goodContainer);
+
+    this.drag();
+
+};
+
+Good.prototype.drag = function () {
+    var $item = $('.good-container');
+    $item.draggable({
+        helper: 'clone',
+        start: function (event, ui) {
+            console.log('event', event, 'ui', ui);
+        }
+    });
+    $item.on('dragstart', function (event, ui) {
+        console.log('event', event, 'ui', ui);
+    })
 };
 

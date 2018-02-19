@@ -4,7 +4,9 @@ function Basket(idBasket) {
     this.amountGoods = 0; //Общая стоимость товаров
     this.basketItems = []; //Массив для хранения товаров
 
+
     this.loadBasketItems();
+    this.drop();
 
 }
 
@@ -35,6 +37,8 @@ Basket.prototype.render = function () {
     $basketDiv.appendTo($basketWrapper );
     $basketContentItems.appendTo($basketContent);
     $basketContent.appendTo($basketWrapper );
+
+
 };
 
 Basket.prototype.loadBasketItems = function () {
@@ -57,8 +61,10 @@ Basket.prototype.loadBasketItems = function () {
            this.countGoods = data.basket.length;
            this.amountGoods = data.amount;
 
-           var $countGoods = $('<p>Кол-во товаров в корзине:'+ this.countGoods +'</p>');
-           var $priceGoods = $('<p>Общая стоимость товаров:'+ this.amountGoods +' руб.</p>');
+           var $countGoods = $('<p>Кол-во товаров в корзине:<br>'+ this.countGoods +'</p>');
+           var $priceGoods = $('<p>Общая стоимость товаров:<br>'+ this.amountGoods +' руб.</p>');
+
+           this.btnCount(this.countGoods);
 
            $countGoods.appendTo($basketData);
            $priceGoods.appendTo($basketData);
@@ -71,7 +77,7 @@ Basket.prototype.loadBasketItems = function () {
     });
 };
 
-Basket.prototype.add = function (id, price) {
+Basket.prototype.add = function (name, id, price, img) {
     var basketItem = {
         "id_product": id,
         "price": price
@@ -81,23 +87,23 @@ Basket.prototype.add = function (id, price) {
     this.amountGoods += price;
     this.basketItems.push(basketItem);
     this.refresh();
-    this.generateBasketItem(id, price);
+    this.generateBasketItem(name, id, price, img);
 
 };
 
 Basket.prototype.refresh = function () {
     var $basketData = $('.basket_data');
     $basketData.empty();
-    var $countGoods = $('<p>Кол-во товаров в корзине:'+ this.countGoods +'</p>');
-    var $priceGoods = $('<p>Общая стоимость товаров:'+ this.amountGoods +' руб.</p>');
+    var $countGoods = $('<p>Кол-во товаров в корзине:<br>'+ this.countGoods +'</p>');
+    var $priceGoods = $('<p>Общая стоимость товаров:<br>'+ this.amountGoods +' руб.</p>');
 
-
+    this.btnCount(this.countGoods);
 
     $countGoods.appendTo($basketData);
     $priceGoods.appendTo($basketData);
 };
 
-Basket.prototype.generateBasketItem = function (id, price) {
+Basket.prototype.generateBasketItem = function (name, id, price, img) {
     var counter = null;
     var that = this;
     var $deleteButtons = $('.delete-button');
@@ -113,10 +119,17 @@ Basket.prototype.generateBasketItem = function (id, price) {
         'data-id': id
     });
 
+    var $title = $('<span />', {
+        class: 'basket_item-title',
+        text: name
+    });
+
     var $price = $('<span />', {
         class: 'price',
         text: price
     });
+
+    var $img = $('<div class="img-container"><img src="'+ img +'"></div>');
 
     var $deleteButton = $('<button />', {
         type: 'button',
@@ -142,11 +155,62 @@ Basket.prototype.generateBasketItem = function (id, price) {
         }
     });
 
+    $contentItem.append($title);
     $contentItem.append($price);
+    $contentItem.append($img);
     $deleteButton.appendTo($contentItem);
     $contentItem.appendTo('.basket_content-items');
 
+};
 
-
+Basket.prototype.display = function () {
+    var $basketWrapper = $('.basket-wrapper');
+    if ($basketWrapper.hasClass('active')) {
+        $basketWrapper.removeClass('active');
+    } else {
+        $basketWrapper.addClass('active');
+    }
 
 };
+
+Basket.prototype.btnCount = function (count) {
+    var $btnBasketItems = $('.btn_basket-items');
+    if (count > 0) {
+        $btnBasketItems.css({
+            display: "inline-block"
+        });
+        $btnBasketItems[0].innerText = this.countGoods;
+    } else {
+
+        $btnBasketItems.css({
+            display: "none"
+        })
+    }
+
+    var that = this;
+    $('.btn-basket').droppable({
+        drop: function (event, ui) {
+            var $uiTitle = ui.draggable.find('.good-title').text();
+            var $uiId = ui.draggable.find('.buy-button').data("id");
+            var $uiPrice = parseInt(ui.draggable.find('.price-container .price').text());
+            var $uiImg = ui.draggable.find('.img-container img').attr("src");
+            that.add($uiTitle, $uiId, $uiPrice, $uiImg);
+
+        }
+    });
+
+};
+
+Basket.prototype.drop = function () {
+    var that = this;
+    $('.basket-wrapper').droppable({
+        drop: function (event, ui) {
+            var $uiTitle = ui.draggable.find('.good-title').text();
+            var $uiId = ui.draggable.find('.buy-button').data("id");
+            var $uiPrice = parseInt(ui.draggable.find('.price-container .price').text());
+            var $uiImg = ui.draggable.find('.img-container img').attr("src");
+            that.add($uiTitle, $uiId, $uiPrice, $uiImg);
+        }
+    });
+};
+
